@@ -15,7 +15,7 @@ ctk.set_default_color_theme("blue")
 class BatchImageConverter:
     def __init__(self, root):
         self.root = root
-        self.root.title("Batch Image Converter - Zenothermic")
+        self.root.title("TypeShift Image Converter - Zenothermic")
         # Increased height slightly to fit the new footer comfortably
         self.root.geometry("600x480")
         # Made window resizable
