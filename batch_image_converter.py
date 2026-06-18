@@ -2,6 +2,10 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from PIL import Image
+import pillow_heif  # <-- Required for HEIC support
+
+# Register HEIF opener to enable Pillow to read and write HEIC/HEIF files
+pillow_heif.register_heif_opener()
 
 class BatchImageConverter:
     def __init__(self, root):
@@ -17,8 +21,8 @@ class BatchImageConverter:
         self.target_format = tk.StringVar(value="JPEG")
         self.quality_var = tk.IntVar(value=100) # Default quality set to 100
         
-        # Supported formats
-        self.formats = ["JPEG", "PNG", "WEBP", "BMP", "GIF", "TIFF"]
+        # Supported formats (HEIC added)
+        self.formats = ["JPEG", "PNG", "WEBP", "BMP", "GIF", "TIFF", "HEIC"]
 
         self.create_widgets()
 
@@ -74,8 +78,8 @@ class BatchImageConverter:
                 messagebox.showerror("Error", f"Could not create destination folder:\n{e}")
                 return
 
-        # Common image extensions to look for
-        valid_extensions = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff', '.gif')
+        # Common image extensions to look for (Added .heic and .heif)
+        valid_extensions = ('.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff', '.gif', '.heic', '.heif')
         files_to_convert = [f for f in os.listdir(src) if f.lower().endswith(valid_extensions)]
 
         if not files_to_convert:
@@ -104,9 +108,10 @@ class BatchImageConverter:
                 dest_path = os.path.join(dest, new_filename)
 
                 # Save the image with quality settings if applicable
-                if ext in ['jpeg', 'jpg', 'webp']:
-                    # JPEG and WEBP support the 'quality' parameter
-                    img.save(dest_path, format=ext.upper(), quality=quality_val)
+                if ext in ['jpeg', 'jpg', 'webp', 'heic']:
+                    # Pillow uses the string "HEIF" to save HEIC files
+                    save_format = "HEIF" if ext == 'heic' else ext.upper()
+                    img.save(dest_path, format=save_format, quality=quality_val)
                 else:
                     # Other formats like PNG or BMP don't use this parameter in the same way
                     img.save(dest_path, format=ext.upper())
